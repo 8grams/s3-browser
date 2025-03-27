@@ -1,0 +1,16 @@
+/* Prevent FOUC */
+.loading {
+  display: none;
+}
+
+.loading.active {
+  display: block;
+}
+
+.content {
+  display: block;
+}
+
+.content.loading {
+  display: none;
+} 
