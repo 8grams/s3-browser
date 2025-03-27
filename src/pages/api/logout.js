@@ -13,8 +13,6 @@ export async function POST({ redirect }) {
     })
   );
 
-  return redirect('/login', {
-    status: 302,
-    headers
-  });
+  headers.append('Location', '/');
+  return new Response(null, { status: 302, headers });
 } 
