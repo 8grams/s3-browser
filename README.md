@@ -9,53 +9,15 @@ A server-side rendered web application for browsing AWS S3 buckets. Built with A
 - Download files using pre-signed URLs
 - Modern UI with TailwindCSS and DaisyUI
 - Server-side rendering for better performance
-- HTMX for smooth interactions without full page reloads
+- HTMX and AlpineJS for smooth interactions
 
-## Prerequisites
+## Run on production
 
-- Node.js 18 or later
-- AWS account with S3 access
-- AWS credentials with appropriate permissions
+The fastest way is to use Docker. Create `.env` based on `.env.example`, run docker 
 
-## Setup
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd s3-browser
 ```
-
-2. Install dependencies:
-```bash
-npm install
+docker run -p 4321:4321 --env-file .env ghcr.io/8grams/s3-browser
 ```
-
-3. Create a `.env` file in the root directory and add your AWS credentials:
-```env
-AWS_ACCESS_KEY_ID=your_access_key_id
-AWS_SECRET_ACCESS_KEY=your_secret_access_key
-```
-
-4. Start the development server:
-```bash
-npm run dev
-```
-
-5. Open your browser and navigate to `http://localhost:4321`
-
-## Usage
-
-1. Enter the name of an S3 bucket you want to browse
-2. Navigate through folders by clicking on them
-3. Download files using the download button
-4. Use the breadcrumb navigation to move up the folder hierarchy
-
-## Security Considerations
-
-- Never commit your `.env` file with real credentials
-- Use IAM roles with minimal required permissions
-- Consider implementing authentication for the web application
-- Use pre-signed URLs with appropriate expiration times
 
 ## License
 
