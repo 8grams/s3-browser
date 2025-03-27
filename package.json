@@ -1,0 +1,19 @@
+{
+  "name": "s3-browser",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "node dist/server/entry.mjs",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.515.0",
+    "@aws-sdk/s3-request-presigner": "3.515.0",
+    "@astrojs/node": "9.0.2",
+    "astro": "5.5.4",
+    "cookie": "0.6.0"
+  }
+}
