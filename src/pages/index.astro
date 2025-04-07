@@ -9,10 +9,21 @@ const authResponse = requireAuth(Astro.request);
 if (authResponse) return authResponse;
 
 const bucket = import.meta.env.DEFAULT_BUCKET;
-const prefix = Astro.url.searchParams.get('prefix') || '';
+const bucketPrefix = import.meta.env.BUCKET_PREFIX || '';
+const requestedPrefix = Astro.url.searchParams.get('prefix') || '';
 const searchQuery = Astro.url.searchParams.get('search') || '';
 const nextToken = Astro.url.searchParams.get('next') || null;
 const pageSize = 20; // Items per page
+
+// If BUCKET_PREFIX is set and no prefix is requested, redirect to BUCKET_PREFIX
+if (bucketPrefix && !requestedPrefix) {
+  return Astro.redirect(`/?prefix=${encodeURIComponent(bucketPrefix)}`);
+}
+
+// If BUCKET_PREFIX is set, ensure we're only accessing that prefix
+if (bucketPrefix && !requestedPrefix.startsWith(bucketPrefix)) {
+  return new Response('Access to this folder is not allowed', { status: 403 });
+}
 
 let files: S3Object[] = [];
 let folders: S3CommonPrefix[] = [];
@@ -25,7 +36,7 @@ if (!bucket) {
 
 try {
   // If there's a search query, use it as a prefix for S3 search
-  const searchPrefix = searchQuery ? `${prefix}${searchQuery}` : prefix;
+  const searchPrefix = searchQuery ? `${requestedPrefix}${searchQuery}` : requestedPrefix;
   const result = await listObjects(bucket, searchPrefix, nextToken || undefined, pageSize);
   files = result.files;
   folders = result.folders;
@@ -42,6 +53,9 @@ try {
       <div>
         <h1 class="text-3xl font-bold">S3 Browser</h1>
         <p class="text-sm text-gray-500">Bucket: {bucket}</p>
+        {bucketPrefix && (
+          <p class="text-sm text-gray-500">Restricted to: {bucketPrefix}</p>
+        )}
       </div>
       <form action="/api/logout" method="POST">
         <button type="submit" class="btn btn-ghost">Logout</button>
@@ -58,20 +72,23 @@ try {
         <!-- Breadcrumb -->
         <div class="text-sm breadcrumbs mb-4">
           <ul>
-            <li><a href="/">Root</a></li>
-            {prefix.split('/').filter(Boolean).map((part, index, array) => (
-              <li>
-                <a href={`/?prefix=${encodeURIComponent(array.slice(0, index + 1).join('/'))}/`}>
-                  {part}
-                </a>
-              </li>
-            ))}
+            <li><a href={`/?prefix=${encodeURIComponent(bucketPrefix)}`}>Root</a></li>
+            {requestedPrefix.split('/').filter(Boolean).map((part, index, array) => {
+              const path = array.slice(0, index + 1).join('/');
+              return (
+                <li>
+                  <a href={`/?prefix=${encodeURIComponent(path)}/`}>
+                    {part}
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
         <!-- Search Bar -->
         <form class="form-control mb-6 max-w-4xl" action="/" method="GET">
-          <input type="hidden" name="prefix" value={prefix} />
+          <input type="hidden" name="prefix" value={requestedPrefix} />
           <div class="flex">
             <input 
               type="text" 
@@ -151,7 +168,7 @@ try {
             <div class="flex justify-center mt-4 gap-2">
               {nextToken && (
                 <a 
-                  href={`/?prefix=${encodeURIComponent(prefix)}&search=${encodeURIComponent(searchQuery)}`}
+                  href={`/?prefix=${encodeURIComponent(requestedPrefix)}&search=${encodeURIComponent(searchQuery)}`}
                   class="btn btn-sm"
                 >
                   Previous
@@ -159,7 +176,7 @@ try {
               )}
               {newNextToken && (
                 <a 
-                  href={`/?prefix=${encodeURIComponent(prefix)}&search=${encodeURIComponent(searchQuery)}&next=${encodeURIComponent(newNextToken)}`}
+                  href={`/?prefix=${encodeURIComponent(requestedPrefix)}&search=${encodeURIComponent(searchQuery)}&next=${encodeURIComponent(newNextToken)}`}
                   class="btn btn-sm"
                 >
                   Next
