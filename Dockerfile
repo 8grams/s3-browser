@@ -28,17 +28,9 @@ WORKDIR /app
 ARG GIT_COMMIT_SHA
 ENV NODE_ENV=production
 
-# Copy built files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
-
-# Set AWS credentials as environment variables
-ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-ENV AWS_REGION=${AWS_REGION}
-ENV DEFAULT_BUCKET=${DEFAULT_BUCKET}
-ENV BUCKET_PREFIX=${BUCKET_PREFIX}
 
 USER node
 
