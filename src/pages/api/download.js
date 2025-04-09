@@ -1,5 +1,6 @@
 import { getSignedUrlForObject } from '../../utils/s3';
 import { requireAuth } from '../../middleware/auth';
+import { env } from "../../utils/env";
 
 export async function GET({ request }) {
   // Check authentication
@@ -8,7 +9,7 @@ export async function GET({ request }) {
 
   const url = new URL(request.url);
   const key = url.searchParams.get('key');
-  const bucket = process.env.DEFAULT_BUCKET;
+  const bucket = env.DEFAULT_BUCKET;
 
   if (!key) {
     return new Response('Missing key parameter', { status: 400 });

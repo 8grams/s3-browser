@@ -1,4 +1,5 @@
 import { serialize } from 'cookie';
+import { env } from "./../../utils/env"
 
 export async function POST({ redirect }) {
   const headers = new Headers();
@@ -7,7 +8,7 @@ export async function POST({ redirect }) {
     serialize('auth', 'false', {
       path: '/',
       httpOnly: true,
-      secure: process.env.PROD,
+      secure: env.PROD,
       sameSite: 'lax',
       maxAge: 0
     })
