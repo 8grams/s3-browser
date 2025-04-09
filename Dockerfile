@@ -10,7 +10,7 @@ COPY . .
 
 RUN pnpm install
 
-RUN mkdir -p /app/.astro && chown -R node:node /app/.astro && chmod -R 755 /app/.astro
+RUN chown -R node:node /app && chmod -R 755 /app
 
 USER node
 
