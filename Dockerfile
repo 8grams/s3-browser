@@ -1,19 +1,47 @@
 # base image
 FROM node:20.15.0-alpine AS base
-WORKDIR /app
 RUN npm install --global --no-update-notifier --no-fund pnpm
 
+# Deps installer
+FROM base AS deps
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
+WORKDIR /app
 
+# Install dependencies based on the preferred package manager
+COPY package.json pnpm-lock.yaml* ./
+RUN CYPRESS_INSTALL_BINARY=0 SENTRY_NO_PROGRESS_BAR=true pnpm install
+
+# Builder
+FROM base AS builder
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN pnpm build
 
-RUN pnpm install
+# Production image
+FROM base AS runner
+WORKDIR /app
 
-RUN chown -R node:node /app && chmod -R 755 /app
+# Get the latest Git tag and pass it as a build argument
+ARG GIT_COMMIT_SHA
+ENV NODE_ENV=production
+
+# Copy built files
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./
+
+# Set AWS credentials as environment variables
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+ENV AWS_REGION=${AWS_REGION}
+ENV DEFAULT_BUCKET=${DEFAULT_BUCKET}
+ENV BUCKET_PREFIX=${BUCKET_PREFIX}
 
 USER node
 
 EXPOSE 4321
 
-CMD ["pnpm", "run", "dev"]
+CMD ["node", "./dist/server/entry.mjs"]

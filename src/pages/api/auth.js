@@ -5,8 +5,8 @@ export async function POST({ request }) {
   const username = formData.get('username');
   const password = formData.get('password');
 
-  const validUsername = import.meta.env.AUTH_USERNAME;
-  const validPassword = import.meta.env.AUTH_PASSWORD;
+  const validUsername = process.env.AUTH_USERNAME;
+  const validPassword = process.env.AUTH_PASSWORD;
 
   if (username === validUsername && password === validPassword) {
     // Set authentication cookie
@@ -16,7 +16,7 @@ export async function POST({ request }) {
       serialize('auth', 'true', {
         path: '/',
         httpOnly: true,
-        secure: import.meta.env.PROD,
+        secure: process.env.PROD,
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 // 24 hours
       })

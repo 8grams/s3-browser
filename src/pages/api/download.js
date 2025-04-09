@@ -8,7 +8,7 @@ export async function GET({ request }) {
 
   const url = new URL(request.url);
   const key = url.searchParams.get('key');
-  const bucket = import.meta.env.DEFAULT_BUCKET;
+  const bucket = process.env.DEFAULT_BUCKET;
 
   if (!key) {
     return new Response('Missing key parameter', { status: 400 });

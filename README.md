@@ -16,7 +16,7 @@ A server-side rendered web application for browsing AWS S3 buckets. Built with A
 The fastest way is to use Docker. Create `.env` based on `.env.example`, run docker 
 
 ```
-docker run -p 4321:4321 --env-file .env ghcr.io/8grams/s3-browser
+docker run -p 4321:4321 -v ./.env:/app/.env ghcr.io/8grams/s3-browser
 ```
 
 ## License

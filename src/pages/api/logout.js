@@ -7,7 +7,7 @@ export async function POST({ redirect }) {
     serialize('auth', 'false', {
       path: '/',
       httpOnly: true,
-      secure: import.meta.env.PROD,
+      secure: process.env.PROD,
       sameSite: 'lax',
       maxAge: 0
     })

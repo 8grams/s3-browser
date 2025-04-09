@@ -4,12 +4,17 @@ import { listObjects } from '../utils/s3';
 import { requireAuth } from '../middleware/auth';
 import type { S3Object, S3CommonPrefix } from '../utils/s3';
 
+// load env variables
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 // Check authentication
 const authResponse = requireAuth(Astro.request);
 if (authResponse) return authResponse;
 
-const bucket = import.meta.env.DEFAULT_BUCKET;
-const bucketPrefix = import.meta.env.BUCKET_PREFIX || '';
+const bucket = process.env.DEFAULT_BUCKET;
+const bucketPrefix = process.env.BUCKET_PREFIX || '';
 const requestedPrefix = Astro.url.searchParams.get('prefix') || '';
 const searchQuery = Astro.url.searchParams.get('search') || '';
 const nextToken = Astro.url.searchParams.get('next') || null;
