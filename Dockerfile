@@ -10,7 +10,10 @@ COPY . .
 
 RUN pnpm install
 
+RUN mkdir -p /app/.astro && chown -R node:node /app/.astro && chmod -R 755 /app/.astro
+
 USER node
+
 EXPOSE 4321
 
 CMD ["pnpm", "run", "dev"]
